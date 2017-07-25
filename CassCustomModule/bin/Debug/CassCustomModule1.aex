@@ -1,0 +1,26 @@
+Scrip Num.Liquidacion PRE:
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    JIRA.bind(JIRA.Events.NEW_CONTENT_ADDED, function (e,context) {
+        limitSize();
+    });
+        limitSize();
+     
+    function limitSize(){
+                 
+                $('#customfield_11800').keyup(function(e){             
+                    var decimalValue = $("#customfield_11800").val();
+                    if(decimalValue < 1 || decimalValue > 9999){
+                        alert("Value should be 1-9999");                       
+                        return false;
+                    }                  
+            });    
+    }  
+     
+});
+</script>
+
+
+
+cat.fgc.ricoh.jira.informes.NumLiquidacio.InformeNumLiq.generateReportHtml

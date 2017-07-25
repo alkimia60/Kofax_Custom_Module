@@ -1,0 +1,11 @@
+﻿[Modules]
+CassCustomModule
+
+[CassCustomModule]
+RuntimeProgram=CassCustomModule.exe
+ModuleID=Kofax.CassCustomModule
+Description=Custom Module para Cass
+Precede=Validation
+Version=10.2
+SupportsTableFields=True
+SupportsNonImageFiles=True
