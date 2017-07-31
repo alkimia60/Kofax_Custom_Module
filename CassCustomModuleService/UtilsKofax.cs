@@ -33,6 +33,7 @@ namespace CassCustomModuleService
                     m_oLogin.Login("Admin", "");
                     m_oLogin.ApplicationName = "Kofax.CassCustomModuleService";
                     m_oLogin.Version = "1.0";
+                    
                 }
                 log.Debug("m_oLogin realizado correctamente");
                 //*** Validate the user with the module UniqueID
@@ -43,6 +44,7 @@ namespace CassCustomModuleService
             {
                 log.Error(e.Message);
             }
+            
             return m_oLogin.RuntimeSession;
         }
         public int getProcessID()

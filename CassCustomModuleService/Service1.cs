@@ -74,56 +74,68 @@ namespace CassCustomModuleService
                    KfxDbFilter dbfilter = KfxDbFilter.KfxDbFilterOnProcess;
                    KfxDbState dbstate = KfxDbState.KfxDbBatchReady;
 
-                   log.Info("Adquiriendo lote en curso...");
-                   workingbatch = m_oRuntimeSession.NextBatchGet(
-                                    processId,
-                                    dbfilter,
-                                    dbstate);
+                  
                    //log.Info("lote en curso conseguido por el usuario: " + workingbatch.ScanUser);
-                   if (workingbatch != null)
+                   do
                    {
-                       IACDataElementCollection oDocCol = utilsWorkingBatch.getIndexFieldsCollection(workingbatch);
 
-                       //Iterate Collection Docs to Extract Collection of IndexFields
-                       if (oDocCol != null & workingbatch.BatchClassName == "Receta")
+                       log.Info("Adquiriendo lote en curso...");
+                       workingbatch = m_oRuntimeSession.NextBatchGet(
+                                        processId,
+                                        dbfilter,
+                                        dbstate);
+
+
+                       if (workingbatch != null)
                        {
-                           log.Info("Por cada elemento se buscará el indexField Barcode ");
-                           foreach (IACDataElement oDoc in oDocCol)
-                           {
+                           IACDataElementCollection oDocCol = utilsWorkingBatch.getIndexFieldsCollection(workingbatch);
 
-                               log.Debug("Adquiriendo elemento IndexField del Documento " + oDoc["BatchDocGUID"]);
-                               IACDataElement oFields = oDoc.FindChildElementByName("IndexFields");
-                               log.Debug("Adquirido elemento IndexFields");
-                               log.Debug("Adquiriendo elemento IndexField a través del atributo Name Barcode");
-                               IACDataElement oField = oFields.FindChildElementByAttribute("IndexField", "Name", "Barcode");
-                               log.Info("Se ha recuperado el valor " + oField["Value"] + " Del campo Barcode ");
+                           //Iterate Collection Docs to Extract Collection of IndexFields
+                           if (oDocCol != null & workingbatch.BatchClassName == "Receta")
+                           {
+                               log.Info("Por cada elemento se buscará el indexField Barcode ");
+                               foreach (IACDataElement oDoc in oDocCol)
+                               {
+
+                                   log.Debug("Adquiriendo elemento IndexField del Documento " + oDoc["BatchDocGUID"]);
+                                   IACDataElement oFields = oDoc.FindChildElementByName("IndexFields");
+                                   log.Debug("Adquirido elemento IndexFields");
+                                   log.Debug("Adquiriendo elemento IndexField a través del atributo Name Barcode");
+                                   IACDataElement oField = oFields.FindChildElementByAttribute("IndexField", "Name", "Barcode");
+                                   log.Info("Se ha recuperado el valor " + oField["Value"] + " Del campo Barcode ");
+
+                               }
+                           }
+                           else if (oDocCol != null & workingbatch.BatchClassName == "FullCotitzacio")
+                           {
+                               log.Info("Por cada elemento se buscará el indexField QRCass ");
+                               foreach (IACDataElement oDoc in oDocCol)
+                               {
+
+                                   log.Debug("Adquiriendo elemento IndexField del Documento " + oDoc["BatchDocGUID"]);
+                                   IACDataElement oFields = oDoc.FindChildElementByName("IndexFields");
+                                   log.Debug("Adquirido elemento IndexFields");
+                                   log.Debug("Adquiriendo elemento IndexField a través del atributo Name QRCass");
+                                   IACDataElement oField = oFields.FindChildElementByAttribute("IndexField", "Name", "QRCass");
+                                   String cleanQR = utilsQR.cleanQR(oField["Value"]);
+
+                                   //log.Info("Se ha recuperado el valor " + oField["Value"] + " Del campo QRCass");
+                                   log.Info("Se ha recuperado el valor " + cleanQR + " Del campo QRCass");
+
+                               }
 
                            }
+
+                           workingbatch.BatchClose(Kofax.Capture.SDK.CustomModule.KfxDbState.KfxDbBatchReady, Kofax.Capture.SDK.CustomModule.KfxDbQueue.KfxDbQueueNext, 0, "");
+                           log.Info("Se ha procesado correctamente el lote con nombre " + workingbatch.Name);
                        }
-                       else if (oDocCol != null & workingbatch.BatchClassName == "FullCotitzacio")
+                       else 
                        {
-                           log.Info("Por cada elemento se buscará el indexField QRCass ");
-                           foreach (IACDataElement oDoc in oDocCol)
-                           {
-
-                               log.Debug("Adquiriendo elemento IndexField del Documento " + oDoc["BatchDocGUID"]);
-                               IACDataElement oFields = oDoc.FindChildElementByName("IndexFields");
-                               log.Debug("Adquirido elemento IndexFields");
-                               log.Debug("Adquiriendo elemento IndexField a través del atributo Name QRCass");
-                               IACDataElement oField = oFields.FindChildElementByAttribute("IndexField", "Name", "QRCass");
-                               String cleanQR = utilsQR.cleanQR(oField["Value"]);
-
-                               //log.Info("Se ha recuperado el valor " + oField["Value"] + " Del campo QRCass");
-                               log.Info("Se ha recuperado el valor " + cleanQR + " Del campo QRCass");
-
-                           }
-
+                           log.Info("No hay más lotes que procesar");
                        }
-
-                       workingbatch.BatchClose(Kofax.Capture.SDK.CustomModule.KfxDbState.KfxDbBatchReady, Kofax.Capture.SDK.CustomModule.KfxDbQueue.KfxDbQueueNext, 0, "");
-                       log.Info("Se ha procesado correctamente el lote con nombre " + workingbatch.Name);
 
                    }
+                   while (workingbatch != null);
                }
                catch (Exception er)
                {
