@@ -108,6 +108,7 @@ namespace CassCustomModuleService
                            }
                            else if (oDocCol != null & workingbatch.BatchClassName == "FullCotitzacio")
                            {
+                               //dfsdfsdflksjdfsdf
                                log.Info("Por cada elemento se buscará el indexField QRCass ");
                                foreach (IACDataElement oDoc in oDocCol)
                                {
