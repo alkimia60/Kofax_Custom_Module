@@ -20,6 +20,8 @@ using Kofax.Capture.DBLite;
 using Kofax.Capture.SDK.Data;
 
 
+//using Newtonsoft.Json;
+
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "App.config", Watch = true)]
 
 namespace CassCustomModuleService
@@ -56,16 +58,14 @@ namespace CassCustomModuleService
 
         private void CassCustomModule(object sender, ElapsedEventArgs e)
         {
-               //IBatch workingbatch;
-               //IRuntimeSession m_oRuntimeSession;
-               //int processId;
 
-
+            log.Info("Primera linea CassCustomModule");
                UtilsKofax utilsKofax = new UtilsKofax();
                UtilsWorkingBatch utilsWorkingBatch = new UtilsWorkingBatch();
                UtilsQR utilsQR = new UtilsQR();
                try
                {
+                   log.Debug("Antes de entrar en login");
                    //Login in Kofax Capture
                    m_oRuntimeSession = utilsKofax.getLogonKofax();
                    //*** Get the Process ID
@@ -74,7 +74,12 @@ namespace CassCustomModuleService
                    KfxDbFilter dbfilter = KfxDbFilter.KfxDbFilterOnProcess;
                    KfxDbState dbstate = KfxDbState.KfxDbBatchReady;
 
-                  
+                   //instanciamos clase para comunicar con Rest de cliente
+                   UtilsRestService restService = new UtilsRestService();
+                   log.Info("respuesta Web Service devuelve String " + restService.getRestString("https://jsonplaceholder.typicode.com/posts/1").Length);
+                   log.Info("respuesta Web Service devuelve objeto " + restService.getRestObject("https://jsonplaceholder.typicode.com/posts/2"));
+                   log.Info("Llamada post desde UtilREst" + restService.postInfo());
+
                    //log.Info("lote en curso conseguido por el usuario: " + workingbatch.ScanUser);
                    do
                    {
@@ -88,7 +93,8 @@ namespace CassCustomModuleService
 
                        if (workingbatch != null)
                        {
-                           IACDataElementCollection oDocCol = utilsWorkingBatch.getIndexFieldsCollection(workingbatch);
+
+                            IACDataElementCollection oDocCol = utilsWorkingBatch.getIndexFieldsCollection(workingbatch);
 
                            //Iterate Collection Docs to Extract Collection of IndexFields
                            if (oDocCol != null & workingbatch.BatchClassName == "Receta")
@@ -104,11 +110,11 @@ namespace CassCustomModuleService
                                    IACDataElement oField = oFields.FindChildElementByAttribute("IndexField", "Name", "Barcode");
                                    log.Info("Se ha recuperado el valor " + oField["Value"] + " Del campo Barcode ");
 
+
                                }
                            }
                            else if (oDocCol != null & workingbatch.BatchClassName == "FullCotitzacio")
                            {
-                               //dfsdfsdflksjdfsdf
                                log.Info("Por cada elemento se buscará el indexField QRCass ");
                                foreach (IACDataElement oDoc in oDocCol)
                                {

@@ -15,6 +15,8 @@ using Kofax.Capture.SDK.CustomModule;
 using Kofax.Capture.DBLite;
 
 
+
+
 namespace CassCustomModuleService
 {
     class UtilsKofax
@@ -24,13 +26,14 @@ namespace CassCustomModuleService
 
         public IRuntimeSession getLogonKofax()
         {
+            log.Debug("Inciando Login");
             try
             {
                 //*** Initialize the login object
                 if (m_oLogin == null)
                 {
                     m_oLogin = new Login();
-                    m_oLogin.Login("Admin", "");
+                    m_oLogin.Login("", "");
                     m_oLogin.ApplicationName = "Kofax.CassCustomModuleService";
                     m_oLogin.Version = "1.0";
                     
